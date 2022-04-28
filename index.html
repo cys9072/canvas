@@ -15,7 +15,7 @@
         }
 
         canvas {
-            background-color: #ccc;
+            background-color: black;
             display: block;
             position: absolute;
             top: 0;
@@ -28,6 +28,10 @@
             width: 50px;
             height: 50px;
         }
+
+        div {
+            background: none;
+        }
     </style>
 </head>
 
@@ -38,45 +42,81 @@
 </body>
 
 <script>
+    //  ---------------------------------------------- when window load start 
     window.addEventListener('load', function (e) {
 
-        let canvas = document.getElementById('canvas1') // 캔버스 정의
-        let ctx = canvas.getContext('2d'); // 캔버스 2d로 정의
-        let w = window.innerWidth; // 윈도우 width
-        let h = window.innerHeight; // 윈도우 height
+        // **************************************************************************************
+        // **************************************************************************************
+        // ************************************************ Variable Assignment - 사용할 변수 지정
+        // **************************************************************************************
+        // **************************************************************************************
+
+        let canvas = document.getElementById('canvas1') // select canvas
+        let ctx = canvas.getContext('2d'); // Acceess Drawing context 
+        let w = window.innerWidth; // window width
+        let h = window.innerHeight; // window height
         canvas.width = window.innerWidth; // cavas width is window width
         canvas.height = window.innerHeight; // canvas height is window height
-        let Character = document.getElementById('imgCh')
-        Character.src = "ch.png"
+        let Character = document.getElementById('imgCh') //select img tag
+        Character.src = "ch.png" // Define img src
 
 
-        function removeCanvas() {
+        function removeCanvas() { // Clear All Canvas 캔버스 전체 지우기
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        function drawBox(x, y, width, height, color) { // draw Box
+        // x = x축 좌표 
+        // firstX = 최초 점 x축 좌표 
+        // moveX = 마지막 점 x축 좌표
+        // controllDotX = 제어점 x축 좌표
+        // controllFirstDotX = 첫번째 제어점 x축 좌표
+        // controllSecondDotX = 두번째 제어점 x축 좌표
+
+        // y = y축 좌표
+        // firstY = 최초 점 y축 좌표
+        // moveY = 마지막 점 x축 좌표
+        // controllDotY = 제어점 y축 좌표
+        // controllFirstDotY = 첫번째 제어점 y축 좌표
+        // controllSecondDotY = 두번째 제어점 y축 좌표
+
+        // width = 도형 가로 길이
+        // height = 도형 세로 길이
+        // radius = 원의 반지름
+
+        // color = 색상
+
+
+
+        // **************************************************************************************
+        // **************************************************************************************
+        // ************************************************ Draws Fn - 그리기 함수 (사각형,라인,원)
+        // **************************************************************************************
+        // **************************************************************************************
+
+        function drawBox(x, y, width, height, color) { // Draw Rectangle - 사각형 그리기
             if (ctx) {
-                ctx.fillStyle = color
-                ctx.fillRect(x, y, width, height);
+                //해당 조건문은 브라우저 마다 canvas API를 지원 안해주는 API가 있어서 최초로 조건문으로 분기처리
+                ctx.fillStyle = color // Define Color - 색상 지정
+                ctx.fillRect(x, y, width, height); // Draw Rectangle API  
             } else {
                 console.log('canvas is not defind')
             }
         }
 
-        function drawLine(firstX, firstY, moveX, moveY, color) {
+        function drawLine(firstX, firstY, moveX, moveY, color) { // Draws Line - 라인 그리기
             if (ctx) {
-                ctx.beginPath();
-                ctx.moveTo(firstX, firstY);
-                ctx.lineTo(moveX, moveY);
-                ctx.strokeStyle = color;
-                ctx.stroke();
+                ctx.beginPath(); // Create a new Path - 새로운 경로 새성
+                ctx.moveTo(firstX, firstY); // Set First Dot Define - 최초 점 위치 지정
+                ctx.lineTo(moveX, moveY); // Draws Line - moveTo로 지정된 첫 점부터 lineTo로 지정한 좌표까지 선을 이음
+                ctx.strokeStyle = color; // Define Line Color
+                ctx.stroke(); // Draws the shape by stroking its outline. - 윤곽선으로 도형 그리기 
 
             } else {
                 console.log('canvas is not defind')
             }
         }
 
-        function drawArc(x, y, radius, color) {
+        function drawArc(x, y, radius, color) { // Draws Circle - 원그리기
 
             if (ctx) {
 
@@ -90,7 +130,8 @@
             }
         }
 
-        function drawQuadraticCurve(firstX, firstY, controllDotX, controllDotY, moveX, moveY, color) {
+        function drawQuadraticCurve(firstX, firstY, controllDotX, controllDotY, moveX, moveY,
+            color) { // Draws Curve Line - 제어점 1개를 가진 곡선 그리기
             if (ctx) {
                 ctx.beginPath();
                 ctx.moveTo(firstX, firstY);
@@ -103,7 +144,7 @@
         }
 
         function drawBezierCurve(firstX, firstY, controllFirstDotX, controllFirstDotY, controllSecondDotX,
-            controllSecondDotY, moveX, moveY, color) {
+            controllSecondDotY, moveX, moveY, color) { // Draws Curve Line - 제어점 2개를 가진 곡선 그리기
             if (ctx) {
                 ctx.beginPath();
                 ctx.moveTo(firstX, firstY)
@@ -121,12 +162,14 @@
         // drawQuadraticCurve(0, 0, 100, 0, 100, 100, "red") //곡선(제어점 1개) 시작점xy 제어점 xy 마지막 점 xy, 색상
         // drawBezierCurve(0, 0, 70, 0, 0, 70, 100, 100, "yellow") //곡선(제어점 2개) 시작점xy, 첫번째 제어점 xy, 두번째 제어점 xy, 마지막 점 xy, 색상
 
-        function makeArc(e) {
+        function makeArc(e) { // when Click window, Create Circle - 브라우저 클릭시 원 생성
             console.log(e.clientX, e.clientY)
             let x = e.clientX;
             let y = e.clientY;
             drawArc(x, y, 20, "red")
         }
+
+
 
         function randomArc() {
             for (let i = 0; i < 50; i++) {
@@ -255,7 +298,7 @@
         // https://velog.io/@suyeonme/JS-Canvas%EB%A1%9C-%EC%95%A0%EB%8B%88%EB%A9%94%EC%9D%B4%EC%85%98-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0
         // http://www.soen.kr/html5/canvas/space.html
 
-
+        asd
 
 
     })
