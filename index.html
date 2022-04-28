@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        canvas {
+            background-color: #ccc;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        #Character {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>d</div>
+    <canvas id="canvas1"></canvas>
+    <img src="ch.png" alt="" id="imgCh">
+</body>
+
+<script>
+    window.addEventListener('load', function (e) {
+
+        let canvas = document.getElementById('canvas1') // 캔버스 정의
+        let ctx = canvas.getContext('2d'); // 캔버스 2d로 정의
+        let w = window.innerWidth; // 윈도우 width
+        let h = window.innerHeight; // 윈도우 height
+        canvas.width = window.innerWidth; // cavas width is window width
+        canvas.height = window.innerHeight; // canvas height is window height
+        let Character = document.getElementById('imgCh')
+        Character.src = "ch.png"
+
+
+        function removeCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawBox(x, y, width, height, color) { // draw Box
+            if (ctx) {
+                ctx.fillStyle = color
+                ctx.fillRect(x, y, width, height);
+            } else {
+                console.log('canvas is not defind')
+            }
+        }
+
+        function drawLine(firstX, firstY, moveX, moveY, color) {
+            if (ctx) {
+                ctx.beginPath();
+                ctx.moveTo(firstX, firstY);
+                ctx.lineTo(moveX, moveY);
+                ctx.strokeStyle = color;
+                ctx.stroke();
+
+            } else {
+                console.log('canvas is not defind')
+            }
+        }
+
+        function drawArc(x, y, radius, color) {
+
+            if (ctx) {
+
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2)
+                ctx.strokeStyle = color;
+                ctx.stroke()
+                // ctx.clearRect()
+            } else {
+                console.log('canvas is not defind')
+            }
+        }
+
+        function drawQuadraticCurve(firstX, firstY, controllDotX, controllDotY, moveX, moveY, color) {
+            if (ctx) {
+                ctx.beginPath();
+                ctx.moveTo(firstX, firstY);
+                ctx.quadraticCurveTo(controllDotX, controllDotY, moveX, moveY)
+                ctx.strokeStyle = color;
+                ctx.stroke()
+            } else {
+                console.log('canvas is not defind')
+            }
+        }
+
+        function drawBezierCurve(firstX, firstY, controllFirstDotX, controllFirstDotY, controllSecondDotX,
+            controllSecondDotY, moveX, moveY, color) {
+            if (ctx) {
+                ctx.beginPath();
+                ctx.moveTo(firstX, firstY)
+                ctx.bezierCurveTo(controllFirstDotX, controllFirstDotY, controllSecondDotX, controllSecondDotY,
+                    moveX,
+                    moveY);
+                ctx.strokeStyle = color;
+                ctx.stroke()
+            }
+        }
+
+        // drawBox(0, 0, 100, 100, "blue") //박스 / 시작 xy , width, height , 색상
+        // drawLine(250, 0, 200, 100, "red") // 라인 / 시작점 xy, 마지막 점 xy, 색상
+        // drawArc(100, 100, 20, "purple") // 원 / 시작 xy, 반지름, 색성
+        // drawQuadraticCurve(0, 0, 100, 0, 100, 100, "red") //곡선(제어점 1개) 시작점xy 제어점 xy 마지막 점 xy, 색상
+        // drawBezierCurve(0, 0, 70, 0, 0, 70, 100, 100, "yellow") //곡선(제어점 2개) 시작점xy, 첫번째 제어점 xy, 두번째 제어점 xy, 마지막 점 xy, 색상
+
+        function makeArc(e) {
+            console.log(e.clientX, e.clientY)
+            let x = e.clientX;
+            let y = e.clientY;
+            drawArc(x, y, 20, "red")
+        }
+
+        function randomArc() {
+            for (let i = 0; i < 50; i++) {
+                drawArc(
+                    Math.floor(Math.random() * w),
+                    Math.floor(Math.random() * h),
+                    Math.floor(Math.random() * 50),
+                    "purple"
+                )
+            }
+        }
+        const circle = {
+            x: 130,
+            y: 130,
+            size: 30,
+            dx: 10,
+            dy: 10,
+        };
+
+        // bounceCircleupDate()
+
+        function bounceCircleupDate() {
+
+            removeCanvas() //캔버스 전체 지우기
+            drawArc(circle.x, circle.y, circle.size, "purple"); //최초 원 그리기
+            // ctx.clearArc(circle.x, circle.y, 300, 300);
+
+            circle.x += circle.dx; // 최초 x축 우측으로 이동
+            circle.y += circle.dy; // 최초 y축 아래로 이동
+
+            // Detect side walls
+            // 첫번쨰 조건 
+            // 원의 x좌표 + 원 지름  > 뷰포트의 넓이 즉, 원의 선이 뷰포트의 우측에 닿았을때
+            // 원의 x좌표 - 원 지름  < 0, 원의 선이 뷰포트의 좌측에 닿았을때
+            if (circle.x + circle.size > canvas.width || circle.x - circle.size < 0) {
+                circle.dx *= -1;
+            }
+
+            // Detect top and bottom walls
+            if (circle.y + circle.size > canvas.height || circle.y - circle.size < 0) {
+                circle.dy *= -1;
+            }
+
+            requestAnimationFrame(bounceCircleupDate)
+        }
+
+        // bounceCircleupDate()
+
+
+
+        // 키보드 입력으로 캐틱터 옮기기
+        const imgObj = {
+            x: 400,
+            y: 300,
+            w: 50,
+            h: 50,
+            speed: 10,
+        };
+        ctx.drawImage(Character, imgObj.x, imgObj.y, imgObj.w, imgObj.h); //최초 이미지 draw
+
+        function keyDown(e) {
+            const keyType = {
+                // 키코드 
+                left: 37,
+                up: 38,
+                right: 39,
+                down: 40,
+            }
+            removeCanvas()
+            ctx.drawImage(Character, imgObj.x, imgObj.y, imgObj.w, imgObj.h);
+
+            if (keyType.left == e.keyCode) {
+                moveLeft()
+            } else if (keyType.up == e.keyCode) {
+                moveUp()
+            } else if (keyType.right == e.keyCode) {
+                moveRight()
+            } else if (keyType.down == e.keyCode) {
+                moveDown()
+            }
+
+            // requestAnimationFrame(keyDown)
+        }
+
+        function moveLeft() {
+            if (imgObj.x > 10) {
+                imgObj.x -= imgObj.speed;
+            } else {
+                return
+            }
+        }
+
+        function moveUp() {
+            if (imgObj.y > 10) {
+                imgObj.y -= imgObj.speed;
+            } else {
+                return
+            }
+        }
+
+        function moveRight() {
+            if (imgObj.x < canvas.width - imgObj.w) {
+                imgObj.x += imgObj.speed;
+            } else {
+                return
+            }
+        }
+
+        function moveDown() {
+            if (imgObj.y < canvas.height - imgObj.h) {
+                imgObj.y += imgObj.speed;
+            } else {
+                return
+            }
+        }
+
+        function keyUp(e) {
+            removeCanvas()
+            ctx.drawImage(Character, imgObj.x, imgObj.y, imgObj.w, imgObj.h);
+        }
+
+
+        document.addEventListener('keyup', keyUp);
+        document.addEventListener('keydown', keyDown);
+
+        // https://velog.io/@suyeonme/JS-Canvas%EB%A1%9C-%EC%95%A0%EB%8B%88%EB%A9%94%EC%9D%B4%EC%85%98-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0
+        // http://www.soen.kr/html5/canvas/space.html
+
+
+
+
+    })
+</script>
+
+</html>
